@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from Utils.Layers import build_block
 
 class yolo(nn.Module):
     def __init__(self, B=2, S=7, C=20):
@@ -30,13 +31,13 @@ class yolo(nn.Module):
         # Block1
         block_list1 = [["Conv", 3, 192, 7, 3, 2],
                        ["MaxPool", 2, 2]]
-        block1 = self.build_block(block_list1)
+        block1 = build_block(block_list1)
         backbone.add_module("Block1", block1)
 
         # Block2
         block_list2 = [["Conv", 192, 128, 3, 1, 1],
                        ["MaxPool", 2, 2]]
-        block2 = self.build_block(block_list2)
+        block2 = build_block(block_list2)
         backbone.add_module("Block2", block2)
 
         # Block3
@@ -45,7 +46,7 @@ class yolo(nn.Module):
                        ["Conv", 256, 512, 1, 0, 1],
                        ["Conv", 512, 512, 3, 1, 1],
                        ["MaxPool", 2, 2]]
-        block3 = self.build_block(block_list3)
+        block3 = build_block(block_list3)
         backbone.add_module("Block3", block3)
 
         # Block4
@@ -60,7 +61,7 @@ class yolo(nn.Module):
                        ["Conv", 512, 512, 1, 0, 1],
                        ["Conv", 512, 1024, 3, 1, 1],
                        ["MaxPool", 2, 2]]
-        block4 = self.build_block(block_list4)
+        block4 = build_block(block_list4)
         backbone.add_module("Block4", block4)
 
         # Block4
@@ -75,7 +76,7 @@ class yolo(nn.Module):
                        ["Conv", 512, 512, 1, 0, 1],
                        ["Conv", 512, 1024, 3, 1, 1],
                        ["MaxPool", 2, 2]]
-        block4 = self.build_block(block_list4)
+        block4 = build_block(block_list4)
         backbone.add_module("Block4", block4)
 
         # Block5
@@ -85,36 +86,15 @@ class yolo(nn.Module):
                        ["Conv", 512, 1024, 3, 1, 1],
                        ["Conv", 1024, 1024, 3, 1, 1],
                        ["Conv", 1024, 1024, 3, 1, 2]]
-        block5 = self.build_block(block_list5)
+        block5 = build_block(block_list5)
         backbone.add_module("Block5", block5)
 
         # Block6
         block_list6 = [["Conv", 1024, 1024, 3, 1, 1],
                        ["Conv", 1024, 1024, 3, 1, 1]]
-        block6 = self.build_block(block_list6)
+        block6 = build_block(block_list6)
         backbone.add_module("Block6", block6)
         return backbone
-
-    def build_block(self, block_list:list):
-        """
-
-        :param block_list: Conv: ["Conv", in_channels, out_channels, kernel_size, padding, stride]
-                        MaxPool2d: ["MaxPool" kernel_size, stride]
-        :return:
-        """
-        block = nn.Sequential()
-        for i, block_info in enumerate(block_list):
-            block_type = block_info[0]
-            if block_type == "Conv":
-                block.add_module("Conv{}".format(i), nn.Conv2d(in_channels=block_info[1],
-                                                               out_channels=block_info[2],
-                                                               kernel_size=block_info[3],
-                                                               padding=block_info[4],
-                                                               stride=block_info[5]))
-            if block_type == "MaxPool":
-                block.add_module("MaxPool{}".format(i), nn.MaxPool2d(kernel_size=block_info[1],
-                                                                     stride=block_info[2]))
-        return block
 
     def forward(self, x):
         B, C, H, W = x.shape

@@ -1,12 +1,13 @@
 import torch.nn as nn
 
 
-def build_block( block_list :list):
+def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) -> nn:
     """
 
+    :param activation_list:
     :param block_list: Conv: ["Conv", in_channels, out_channels, kernel_size, padding, stride]
                     MaxPool2d: ["MaxPool" kernel_size, stride]
-    :return:
+    :return: nn
     """
     block = nn.Sequential()
     for i, block_info in enumerate(block_list):
@@ -24,4 +25,27 @@ def build_block( block_list :list):
         if block_type == "AvgPool":
             block.add_module("AvgPool{}".format(i), nn.AvgPool2d(kernel_size=block_info[1],
                                                                  stride=block_info[2]))
+        if block_type == "BatchNorm":
+            block.add_module("BatchNorm{}".format(i), nn.BatchNorm2d(num_features=block_info[1]))
+            block.add_module("{}{}".format(activation_list[0], i), build_activation(activation_list))
+
     return block
+
+
+def build_activation(activation_list: list) -> nn:
+    """
+    get the activation layer by the name
+    :param activation_list:
+    :return: nn
+    """
+    activation_name = activation_list[0]
+    if activation_name == "ReLU":
+        return nn.ReLU()
+    if activation_name == "LeakyReLU":
+        return nn.LeakyReLU(*activation_list[1:])
+    if activation_name == "Sigmoid":
+        return nn.Sigmoid()
+    if activation_name == "Tanh":
+        return nn.Tanh()
+
+    return nn.ReLU()

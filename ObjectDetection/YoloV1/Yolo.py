@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from Utils.Layers import build_block
 
-class yolo(nn.Module):
+class yoloV1(nn.Module):
     def __init__(self, B=2, S=7, C=20):
         """
         implementation of yolo v1
@@ -13,7 +13,7 @@ class yolo(nn.Module):
         :param S: the shape of grid of one image
         :param C: the number of different object
         """
-        super(yolo, self).__init__()
+        super(yoloV1, self).__init__()
         self.B = B
         self.C = C
         self.S = S
@@ -104,9 +104,15 @@ class yolo(nn.Module):
         latent = latent.reshape((latent.shape[0], -1))
         output = self.head(latent)
         output = output.reshape((output.shape[0], self.S, self.S, -1))
-        return output
+        dx = torch.sigmoid(output[:, :, :, 0:self.B*5:5])
+        dy = torch.sigmoid(output[:, :, :, 1:self.B*5:5])
+        dw = torch.exp(output[:, :, :, 2:self.B*5:5])
+        dh = torch.exp(output[:, :, :, 3:self.B*5:5])
+        iou_pred = torch.sigmoid(output[:, :, :, 4:self.B*5:5])
+        cls_pred = torch.sigmoid(output[:, :, :, 5:])
+        return dx, dy, dw, dh, iou_pred, cls_pred
 
 if __name__ == "__main__":
-   model = yolo()
+   model = yoloV1()
    img = torch.rand((1, 3,448,448))
    print(model(img).shape)

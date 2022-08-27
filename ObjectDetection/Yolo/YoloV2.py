@@ -17,10 +17,7 @@ class yoloV2(BaseYolo):
             2. The resolution of finetuned backbone is 448*448, while that of yolo V1 is 224 * 224
             3. Use anchors boxes, and several objects can be predict in one grid
             4. Use kmeans to find best anchors boxes
-        :param n_anchors: number of anchors
-        :param n_class: number of objects
-        :param img_size: the size of image, and the default value is 448
-        :param activation_list: the setting of activation layer
+        :param cfg: configuration
         """
         super(yoloV2, self).__init__()
 

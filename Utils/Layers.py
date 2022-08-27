@@ -1,7 +1,7 @@
 from collections import OrderedDict
-
+import torch
 import torch.nn as nn
-
+from ObjectDetection.Utils.NeckLayer import *
 
 def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) -> nn:
     """
@@ -26,7 +26,8 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
                                                            stride=block_info[5]))
         if block_type == "MaxPool":
             block.add_module("MaxPool{}".format(i), nn.MaxPool2d(kernel_size=block_info[1],
-                                                                 stride=block_info[2]))
+                                                                 padding=block_info[2],
+                                                                 stride=block_info[3]))
 
         if block_type == "AvgPool":
             block.add_module("AvgPool{}".format(i), nn.AvgPool2d(kernel_size=block_info[1],
@@ -37,19 +38,32 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
             block.add_module("{}{}".format(activation_list[0], i), build_activation(activation_list))
 
         if block_type == "Residual":
-            block.add_module("{}{}".format(block_info[0],i), Residual(input_channel=block_info[1],
-                                                                      mid_channel=block_info[2],
-                                                                      kernel_size=block_info[3],
-                                                                      padding=block_info[4],
-                                                                      stride=block_info[5],
-                                                                      activation_list=activation_list))
-        if block_type == "Darknet_block":
-            block.add_module("{}{}".format(block_info[0],i), Darknet_block(input_channel=block_info[1],
-                                                                           output_channel=block_info[2],
-                                                                           activation_list=activation_list))
+            block.add_module("{}{}".format(block_info[0], i), Residual(input_channel=block_info[1],
+                                                                       mid_channel=block_info[2],
+                                                                       kernel_size=block_info[3],
+                                                                       padding=block_info[4],
+                                                                       stride=block_info[5],
+                                                                       activation_list=activation_list))
+        if block_type == "ConvSet_block":
+            block.add_module("{}{}".format(block_info[0], i), ConvSet_block(input_channel=block_info[1],
+                                                                            output_channel=block_info[2],
+                                                                            n_block=block_info[3],
+                                                                            activation_list=activation_list))
         if block_type == "UpNearest":
             block.add_module("{}{}".format(block_info[0], i), nn.UpsamplingNearest2d(scale_factor=block_info[1]))
 
+        if block_type == "DarkNet_block":
+            block.add_module("{}{}".format(block_info[0], i), DarkNet_block(input_channel=block_info[1],
+                                                                            n_block=block_info[2],
+                                                                            activation_list=activation_list))
+        if block_type == "CSPDarkNet_block":
+            block.add_module("{}{}".format(block_info[0], i), CSPDarkNet_block(input_channel=block_info[1],
+                                                                               output_channel=block_info[2],
+                                                                               n_block=block_info[3],
+                                                                               csp_mode=block_info[4],
+                                                                               activation_list=activation_list))
+        if block_type == "SPP":
+            block.add_module("{}{}".format(block_info[0], i), SPP(input_channel=block_info[1]))
     return block
 
 
@@ -72,39 +86,18 @@ def build_activation(activation_list: list) -> nn:
     return nn.ReLU()
 
 
-class IntermediateLayerGetter(nn.ModuleDict):
-    """ get the output of certain layers """
-
-    def __init__(self, model, return_layers):
-        # 判断传入的return_layers是否存在于model中
-        if not set(return_layers).issubset([name for name, _ in model.named_modules()]):
-            raise ValueError("return_layers are not present in model")
-
-        orig_return_layers = return_layers
-        return_layers = {k: v for k, v in return_layers.items()}  # 构造dict
-        layers = OrderedDict()
-        # 将要从model中获取信息的最后一层之前的模块全部复制下来
-        for name, module in model.named_modules():
-            if name== "":
-                continue
-            layers[name] = module
-            if name in return_layers:
-                del return_layers[name]
-            if not return_layers:
-                break
-
-        super(IntermediateLayerGetter, self).__init__(layers)  # 将所需的网络层通过继承的方式保存下来
-        self.return_layers = orig_return_layers
+class DarkNet_block(nn.Module):
+    def __init__(self, input_channel, n_block, activation_list=["LeakyReLU", 0.2]):
+        super(DarkNet_block, self).__init__()
+        self.darknet_block_list = [["Conv", input_channel, input_channel//2, 1, 0, 1],
+                                   ["BatchNorm", input_channel//2],
+                                   ["Conv", input_channel//2, input_channel, 3, 1, 1],
+                                   ["BatchNorm", input_channel],
+                                   ["Residual", input_channel, input_channel*2, 3, 1, 1]]*n_block
+        self.darknet_block = build_block(self.darknet_block_list, activation_list)
 
     def forward(self, x):
-        out = OrderedDict()
-        # 将所需的值以k,v的形式保存到out中
-        for name, module in self.named_modules():
-            x = module(x)
-            if name in self.return_layers:
-                out_name = self.return_layers[name]
-                out[out_name] = x
-        return out
+        return self.darknet_block(x)
 
 
 class Residual(nn.Module):
@@ -129,24 +122,70 @@ class Residual(nn.Module):
     def forward(self, x):
         latent = self.block1(x)
         latent = self.block2(latent)
-        output = latent+x
+        output = latent + x
         return output
 
 
-class Darknet_block(nn.Module):
-    def __init__(self, input_channel, output_channel, activation_list=["LeakyReLU", 0.2]):
-        super(Darknet_block, self).__init__()
-        self.darknet_block_list = [["Conv", input_channel, input_channel//2, 1, 0, 1],
-                                   ["BatchNorm", input_channel//2],
-                                   ["Conv", input_channel//2, input_channel, 3, 1, 1],
-                                   ["BatchNorm", input_channel],
-                                   ["Conv", input_channel, input_channel // 2, 1, 0, 1],
+class ConvSet_block(nn.Module):
+    def __init__(self, input_channel, output_channel, n_block=1, activation_list=["LeakyReLU", 0.2]):
+        super(ConvSet_block, self).__init__()
+        if n_block>1:
+            assert input_channel == output_channel
+        self.darknet_block_list = [["Conv", input_channel, input_channel // 2, 1, 0, 1],
                                    ["BatchNorm", input_channel // 2],
                                    ["Conv", input_channel // 2, input_channel, 3, 1, 1],
                                    ["BatchNorm", input_channel],
                                    ["Conv", input_channel, output_channel, 1, 0, 1],
-                                   ["BatchNorm", output_channel]]
+                                   ["BatchNorm", output_channel],
+                                   ["Conv", output_channel, output_channel * 2, 3, 1, 1],
+                                   ["BatchNorm", output_channel * 2],
+                                   ["Conv", output_channel * 2, output_channel, 1, 0, 1],
+                                   ["BatchNorm", output_channel]] * n_block
         self.darknet_block = build_block(block_list=self.darknet_block_list, activation_list=activation_list)
 
     def forward(self, x):
         return self.darknet_block(x)
+
+
+class CSPDarkNet_block(nn.Module):
+    def __init__(self, input_channel, output_channel, n_block=1, activation_list=["LeakyReLU", 0.2],
+                 csp_mode="fusion_last"):
+        """
+        In CSPDarknet Block, The input x is divided into two parts along the channel direction.
+        The Paper url:
+        https://openaccess.thecvf.com/content_CVPRW_2020/html/w28/Wang_CSPNet_A_New_Backbone_That_Can_Enhance_Learning_Capability_of_CVPRW_2020_paper.html
+        :param input_channel: the number of input channel
+        :param output_channel: the output of output channel
+        :param activation_list: the setting of activation layer
+        :param csp_mode: fusion_last or fusion_first, the detail can be found in paper of CSPNet
+        """
+        super(CSPDarkNet_block, self).__init__()
+        self.csp_mode = csp_mode
+        assert output_channel > input_channel // 2
+        if self.csp_mode == "fusion_last":
+            self.transition_layer = nn.Conv2d(input_channel // 2, output_channel - input_channel // 2,
+                                              kernel_size=1)
+        else:
+            self.transition_layer = nn.Conv2d(input_channel, output_channel, kernel_size=1)
+        self.darknet_block = DarkNet_block(input_channel // 2, n_block, activation_list=activation_list)
+
+    def forward(self, x):
+        B, C, H, W = x.shape
+        x_part1 = x[:, :C // 2, :, :]
+        x_part2 = x[:, C // 2:, :, :]
+        if self.csp_mode == "fusion_last":
+            x_part2 = self.darknet_block(x_part2)
+            x_part2 = self.transition_layer(x_part2)
+            output = torch.cat([x_part1, x_part2], dim=1)
+        else:
+            x_part2 = self.darknet_block(x_part2)
+            output = torch.cat([x_part1, x_part2], dim=1)
+            output = self.transition_layer(output)
+        return output
+
+
+if __name__ == "__main__":
+    x = torch.rand((3, 512, 12, 12))
+    csp_darnet_block = CSPDarkNet_block(512, 512)
+    output = csp_darnet_block(x)
+    print(output.shape)

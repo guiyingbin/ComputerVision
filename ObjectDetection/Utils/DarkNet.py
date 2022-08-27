@@ -19,15 +19,14 @@ class darknet(nn.Module):
         self.model_type = model_type
 
         model_config = darknet_cfg[model_type]
-        self.darknet_model_list = self.build_darknet(model_config)
-
+        self.darknet_model = self.build_darknet(model_config)
 
     def forward(self, img):
         if self.model_type == "darknet_19":
             output = self.darknet_model(img)
             return output
         elif self.model_type in ["darknet_53", "cspdarknet_53"]:
-            C4, C5, C6 = self.darknet_model_list
+            C4, C5, C6 = self.darknet_model
             output1 = C4(img)
             output2 = C5(output1)
             output3 = C6(output2)

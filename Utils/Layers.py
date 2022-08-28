@@ -82,9 +82,15 @@ def build_activation(activation_list: list) -> nn:
         return nn.Sigmoid()
     if activation_name == "Tanh":
         return nn.Tanh()
-
+    if activation_name == "Mish":
+        return Mish()
     return nn.ReLU()
 
+class Mish(nn.Module):
+    def __init__(self):
+        super(Mish, self).__init__()
+    def forward(self, x):
+        return x*torch.tanh(torch.log(1+torch.exp(x)))
 
 class DarkNet_block(nn.Module):
     def __init__(self, input_channel, n_block, activation_list=["LeakyReLU", 0.2]):

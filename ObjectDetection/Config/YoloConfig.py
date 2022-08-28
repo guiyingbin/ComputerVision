@@ -75,3 +75,4 @@ class yolov4_cfg(yolov3_cfg):
         "C4":
             [["ConvSet_block", 384, 128, 1]]
     }
+    activation_list = ["Mish"]

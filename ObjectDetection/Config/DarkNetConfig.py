@@ -75,6 +75,7 @@ darknet_cfg = {
             "block10":
                 [["DarkNet_block", 1024, 4]]
             },
+
     "cspdarknet_53": {
             "block1":
                 [["Conv", 3, 32, 3, 1, 1],
@@ -102,5 +103,28 @@ darknet_cfg = {
                  ["BatchNorm", 1024]],
             "block10":
                 [["CSPDarkNet_block", 1024, 1024, 4, "fusion_last"]]
-            }
+            },
+    "cspnet_yolo5s": {
+            "block1":
+                [["Focus", 3, 32],
+                 ["BatchNorm", 32],
+                 ["Conv", 32, 64, 3, 1, 2]],
+            "block2":
+                [["CSP1_block", 64, 64, 1]],
+            "block3":
+                [["Conv", 64, 128, 3, 1, 2],
+                 ["BatchNorm", 128]],
+            "block4":
+                [["CSP1_block", 128, 128, 3]],
+            "block5":
+                [["Conv", 128, 256, 3, 1, 2],
+                 ["BatchNorm", 256]],
+            "block6":
+                [["CSP1_block", 256, 256, 3]],
+            "block7":
+                [["Conv", 256, 512, 3, 1, 2],
+                 ["BatchNorm", 512]],
+            "block8":
+                [["SPP", 512]]
+            },
 }

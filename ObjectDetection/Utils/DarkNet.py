@@ -1,4 +1,4 @@
-from Utils.Layers import build_block
+from ObjectDetection.Utils.Layers import build_block
 import torch.nn as nn
 import torch
 from ObjectDetection.Config.DarkNetConfig import darknet_cfg
@@ -26,7 +26,7 @@ class darknet(nn.Module):
         if self.model_type == "darknet_19":
             output = self.darknet_model(img)
             return output
-        elif self.model_type in ["darknet_53", "cspdarknet_53"]:
+        elif self.model_type in ["darknet_53", "cspdarknet_53", "cspnet_yolo5s"]:
             C4, C5, C6 = self.darknet_model
             output1 = C4(img)
             output2 = C5(output1)
@@ -40,21 +40,28 @@ class darknet(nn.Module):
                 model.add_module(block_name, build_block(block_list, self.activation_list))
 
         elif self.model_type in ["darknet_53", "cspdarknet_53"]:
-            model = []
-            temp_model = nn.Sequential()
-            for block_name, block_list in model_config.items():
-                if block_name in ["block7", "block9"]:
-                    model.append(temp_model)
-                    temp_model = nn.Sequential()
-                temp_model.add_module(block_name, build_block(block_list, self.activation_list))
-            model.append(temp_model)
+            model = self.build_multi_output_model(model_config, ["block7", "block9"])
 
+        elif self.model_type in ["cspnet_yolo5s"]:
+            model = self.build_multi_output_model(model_config, ["block5", "block7"])
+
+        return model
+
+    def build_multi_output_model(self, model_config: dict, output_point: list):
+        model = []
+        temp_model = nn.Sequential()
+        for block_name, block_list in model_config.items():
+            if block_name in output_point:
+                model.append(temp_model)
+                temp_model = nn.Sequential()
+            temp_model.add_module(block_name, build_block(block_list, self.activation_list))
+        model.append(temp_model)
         return model
 
 
 if __name__ == "__main__":
 
-    model = darknet(model_type="cspdarknet_53")
+    model = darknet(model_type="cspnet_yolo5s")
     img = torch.rand((1, 3, 416, 416))
     output1, output2, output3 = model(img)
     print(output1.shape)

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from Utils.Layers import build_block
+from ObjectDetection.Utils.Layers import build_block
 from sklearn.cluster import KMeans
 import numpy as np
 from ObjectDetection.Utils.DarkNet import darknet

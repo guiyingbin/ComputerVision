@@ -73,6 +73,32 @@ class yolov4_cfg(yolov3_cfg):
              ["BatchNorm", 128],
              ["UpNearest", 2]],
         "C4":
-            [["ConvSet_block", 384, 128, 1]]
+            [["ConvSet_block", 384, 128, 1]],
+        "PAN":
+            [["PAN", [128, 256, 1024], "Conv"]]
     }
     activation_list = ["Mish"]
+
+class yolov5s_cfg(yolov4_cfg):
+    backbone_type = "cspnet_yolo5s"
+    neck_config = {
+        "C6":
+            [["CSP2_block", 512, 512, 1],
+             ["Conv", 512, 1024, 3, 1, 1],
+             ["BatchNorm", 1024]],
+        "C6_up":
+            [["Conv", 1024, 256, 1, 0, 1],
+             ["BatchNorm", 256],
+             ["UpNearest", 2]],
+        "C5":
+            [["CSP2_block", 512, 512, 1],
+             ["Conv", 512, 256, 1, 0, 1]],
+        "C5_up":
+            [["Conv", 256, 128, 1, 0, 1],
+             ["BatchNorm", 128],
+             ["UpNearest", 2]],
+        "C4":
+            [["CSP2_block", 256, 128, 1]],
+        "PAN":
+            [["PAN", [128, 256, 1024], "CSP2_block"]]
+    }

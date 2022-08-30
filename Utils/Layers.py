@@ -64,6 +64,10 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
                                                                                activation_list=activation_list))
         if block_type == "SPP":
             block.add_module("{}{}".format(block_info[0], i), SPP(input_channel=block_info[1]))
+
+        if block_type == "BLSTM":
+            block.add_module("{}{}".format(block_info[0], i), BidirectionalLSTM(*block_info[1:]))
+
     return block
 
 
@@ -85,6 +89,23 @@ def build_activation(activation_list: list) -> nn:
 
     return nn.ReLU()
 
+class BidirectionalLSTM(nn.Module):
+
+    def __init__(self, input_size, hidden_size, output_size):
+        super(BidirectionalLSTM, self).__init__()
+
+        self.rnn = nn.LSTM(input_size, hidden_size, bidirectional=True)
+        self.embedding = nn.Linear(hidden_size * 2, output_size)
+
+    def forward(self, input):
+        recurrent, _ = self.rnn(input)
+        T, b, h = recurrent.size()
+        t_rec = recurrent.view(T * b, h)
+
+        output = self.embedding(t_rec)  # [T * b, nOut]
+        output = output.view(T, b, -1)
+
+        return output
 
 class DarkNet_block(nn.Module):
     def __init__(self, input_channel, n_block, activation_list=["LeakyReLU", 0.2]):

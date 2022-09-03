@@ -89,6 +89,7 @@ def build_activation(activation_list: list) -> nn:
 
     return nn.ReLU()
 
+
 class BidirectionalLSTM(nn.Module):
 
     def __init__(self, input_size, hidden_size, output_size):

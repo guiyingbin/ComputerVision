@@ -1,6 +1,6 @@
 from Utils.Layers import build_block
 import torch.nn as nn
-from ObjectDetection.Config.OcrConfig import crnn_cfg
+from ObjectDetection.Config.OcrConfig import crnn_model_cfg
 import torch
 
 
@@ -25,13 +25,13 @@ class crnn(nn.Module):
     def forward(self, x):
         latent = self.backbone(x)
         B, C, H, W = latent.size()
-        print(latent.size())
         assert H == 1
         latent = latent.reshape(B, C, H*W).permute(2, 0, 1)
         output = self.head(latent)
         return output
 
+
 if __name__ == "__main__":
-    crnn_model = crnn(crnn_cfg)
+    crnn_model = crnn(crnn_model_cfg)
     x = torch.randn((3, 3, 32, 240))
     print(crnn_model(x).shape)

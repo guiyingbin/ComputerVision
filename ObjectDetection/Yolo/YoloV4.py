@@ -9,14 +9,14 @@ class yoloV4(yoloV3):
     def __init__(self, cfg):
         super(yoloV4, self).__init__(cfg)
 
-    def build_neck(self, model_config):
-        big_object_block1 = build_block(model_config["C6"], activation_list=self.activation_list)
-        big_object_upsample = build_block(model_config["C6_up"], activation_list=self.activation_list)
+    def build_neck(self, model_config, activation_list):
+        big_object_block1 = build_block(model_config["C6"], activation_list=activation_list)
+        big_object_upsample = build_block(model_config["C6_up"], activation_list=activation_list)
 
-        mid_object_block1 = build_block(model_config["C5"], activation_list=self.activation_list)
-        mid_object_upsample = build_block(model_config["C5_up"], activation_list=self.activation_list)
+        mid_object_block1 = build_block(model_config["C5"], activation_list=activation_list)
+        mid_object_upsample = build_block(model_config["C5_up"], activation_list=activation_list)
 
-        small_object_block1 = build_block(model_config["C4"], activation_list=self.activation_list)
+        small_object_block1 = build_block(model_config["C4"], activation_list=activation_list)
         pan = build_block(model_config["PAN"], activation_list=["LeakyReLU", 0.2])
         neck = {"C6": big_object_block1,
                 "C6_up": big_object_upsample,

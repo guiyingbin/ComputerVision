@@ -102,3 +102,45 @@ class yolov5s_cfg(yolov4_cfg):
         "PAN":
             [["PAN", [128, 256, 1024], "CSP2_block"]]
     }
+
+
+class yolov7_cfg(base_cfg):
+    n_anchors = 5
+    n_class = 5
+    output_channel = n_anchors * (n_class + 5)
+    backbone_type = "elannet_yolo7"
+    backbone_activation_list = ["Silu"]
+    neck_activation_list = ["Silu"]
+    head_activation_list = ["Silu"]
+    neck_config = {
+        "C6":
+            [["SPP_CSP_Conv", 1024]],
+        "C6_up":
+            [["Conv", 512, 256, 1, 0, 1],
+             ["BatchNorm", 256],
+             ["UpNearest", 2]],
+        "C5":
+            [["ELAN", 512, "W"]],
+        "C5_up":
+            [["Conv", 256, 128, 1, 0, 1],
+             ["BatchNorm", 128],
+             ["UpNearest", 2]],
+        "C4":
+            [["ELAN", 256, "W"]],
+        "PAN":
+            [["PAN", [128, 256, 1024], "ELAN_MP"]]
+    }
+    head_config = {
+        "C6":
+            [["RepConv", 512],
+             ["Conv", 512, output_channel, 1, 0, 1],
+             ["BatchNorm", output_channel]],
+        "C5":
+            [["RepConv", 256],
+             ["Conv", 256, output_channel, 1, 0, 1],
+             ["BatchNorm", output_channel]],
+        "C4":
+            [["RepConv", 128],
+             ["Conv", 128, output_channel, 1, 0, 1],
+             ["BatchNorm", output_channel]]
+    }

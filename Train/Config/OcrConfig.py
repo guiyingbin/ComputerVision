@@ -1,5 +1,5 @@
 """
-This is configuration of training process of Ocr
+This is configuration of training process of TextDetection
 @author:guiyingbin
 @time:2022/09/03
 """
@@ -7,7 +7,7 @@ import torch
 
 from DataSet.Utils.strConverter import textConverter
 from ObjectDetection.Config.OcrConfig import crnn_model_cfg
-from ObjectDetection.Ocr.CRNN import crnn
+from Classification.TextRecognize.CRNN import crnn
 
 class base_train_cfg:
     epoch = None

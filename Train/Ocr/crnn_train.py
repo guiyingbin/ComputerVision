@@ -54,6 +54,7 @@ class Trainer(baseTrainer):
                     losses.update(loss.item(), n=N)
                 # print("val loss:{}".format(loss.item()))
             pbar.set_postfix(loss=losses.get_avg())
+
     def train_fold(self, fold):
         print("=============fold:{}============".format(fold))
         train_dataset = baiduOcr(img_size=self.cfg.img_size,
@@ -61,6 +62,7 @@ class Trainer(baseTrainer):
                                  dataframe=self.dataframe)
         train_dataloader = DataLoader(train_dataset, batch_size=self.cfg.batch_size)
         self.train_one_epoch(train_dataloader)
+
 
 if __name__ == "__main__":
     trainer = Trainer()

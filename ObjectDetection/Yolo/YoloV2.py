@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from Utils.Layers import build_block
+from ObjectDetection.Utils.Layers import build_block
 from sklearn.cluster import KMeans
 import numpy as np
 from ObjectDetection.Utils.DarkNet import darknet
@@ -26,16 +26,16 @@ class yoloV2(BaseYolo):
         self.n_anchors = cfg.n_anchors
         self.activation_list = cfg.activation_list
         self.anchor_bboxs = np.array([])
-        self.backbone = self.build_backbone(cfg.backbone_type)
-        self.head = self.build_head(cfg.head_config)
+        self.backbone = self.build_backbone(cfg.backbone_type, self.activation_list)
+        self.head = self.build_head(cfg.head_config, self.activation_list)
 
-    def build_backbone(self, model_type):
-        return darknet(model_type=model_type, activation_list=self.activation_list)
+    def build_backbone(self, model_type, activation_list):
+        return darknet(model_type=model_type, activation_list=activation_list)
 
-    def build_head(self, model_config):
+    def build_head(self, model_config, activation_list):
         head = nn.Sequential()
         for block_name, block_list in model_config.items():
-            head.add_module(block_name, build_block(block_list))
+            head.add_module(block_name, build_block(block_list, activation_list))
         return head
 
     def get_anchors(self, bbox_wh_data: np.array):

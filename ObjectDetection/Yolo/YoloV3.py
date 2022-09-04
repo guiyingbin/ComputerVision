@@ -1,6 +1,5 @@
 import torch
-import torch.nn as nn
-from Utils.Layers import build_activation, ConvSet_block, build_block
+from ObjectDetection.Utils.Layers import build_block
 from ObjectDetection.Yolo.YoloV2 import yoloV2
 from ObjectDetection.Config.YoloConfig import yolov3_cfg
 
@@ -16,16 +15,16 @@ class yoloV3(yoloV2):
         """
         super(yoloV3, self).__init__(cfg)
 
-        self.neck = self.build_neck(cfg.neck_config)
+        self.neck = self.build_neck(cfg.neck_config, cfg.activation_list)
 
-    def build_neck(self, model_config):
-        big_object_block1 = build_block(model_config["C6"], activation_list=self.activation_list)
-        big_object_upsample = build_block(model_config["C6_up"], activation_list=self.activation_list)
+    def build_neck(self, model_config, activation_list):
+        big_object_block1 = build_block(model_config["C6"], activation_list=activation_list)
+        big_object_upsample = build_block(model_config["C6_up"], activation_list=activation_list)
 
-        mid_object_block1 = build_block(model_config["C5"], activation_list=self.activation_list)
-        mid_object_upsample = build_block(model_config["C5_up"], activation_list=self.activation_list)
+        mid_object_block1 = build_block(model_config["C5"], activation_list=activation_list)
+        mid_object_upsample = build_block(model_config["C5_up"], activation_list=activation_list)
 
-        small_object_block1 = build_block(model_config["C4"], activation_list=self.activation_list)
+        small_object_block1 = build_block(model_config["C4"], activation_list=activation_list)
         neck = {"C6": big_object_block1,
                 "C6_up": big_object_upsample,
                 "C5": mid_object_block1,
@@ -33,15 +32,15 @@ class yoloV3(yoloV2):
                 "C4": small_object_block1}
         return neck
 
-    def build_head(self, model_config):
+    def build_head(self, model_config, activation_list):
         # object detection layer for big object
-        big_object_block2 = build_block(model_config["C6"], activation_list=self.activation_list)
+        big_object_block2 = build_block(model_config["C6"], activation_list=activation_list)
 
         # object detection layer for mid object
-        mid_object_block2 = build_block(model_config["C5"], activation_list=self.activation_list)
+        mid_object_block2 = build_block(model_config["C5"], activation_list=activation_list)
 
         # object detection layer for small object
-        small_object_block2 = build_block(model_config["C4"], activation_list=self.activation_list)
+        small_object_block2 = build_block(model_config["C4"], activation_list=activation_list)
 
         head = {"C6": big_object_block2,
                 "C5": mid_object_block2,

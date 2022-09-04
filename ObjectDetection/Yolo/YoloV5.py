@@ -6,6 +6,7 @@ class yoloV5(yoloV4):
     def __init__(self, cfg):
         """
         reference:https://zhuanlan.zhihu.com/p/172121380
+        No paper
         :param cfg:
         """
         super(yoloV5, self).__init__(cfg)

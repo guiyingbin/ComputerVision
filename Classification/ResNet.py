@@ -1,5 +1,6 @@
 import torch.nn as nn
-from Segmentation.Config.ResNetConfig import resnet_cfg
+from Classification.Config.ResNetConfig import resnet_cfg
+from Classification.Utils.Layers import build_block
 
 
 class resnet(nn.Module):
@@ -20,7 +21,7 @@ class resnet(nn.Module):
         self.resnet_model = self.build_resnet(model_config)
 
     def build_resnet(self, model_config):
-        model = self.build_multi_output_model(model_config, [])
+        model = self.build_multi_output_model(model_config, ["block3", "block5", "block7"])
         return model
 
     def build_multi_output_model(self, model_config: dict, output_point: list):
@@ -35,9 +36,18 @@ class resnet(nn.Module):
         return model
 
     def forward(self, img):
-        P3, P4, P5, P6 = self.darknet_model
-        output1 = P3(img)
-        output2 = P4(output1)
-        output3 = P5(output2)
-        output4 = P6(output3)
+        P2, P3, P4, P5 = self.resnet_model
+        output1 = P2(img)
+        output2 = P3(output1)
+        output3 = P4(output2)
+        output4 = P5(output3)
         return output1, output2, output3, output4
+
+
+if __name__ == "__main__":
+    import torch
+    res = resnet(model_type="resnet_50")
+    img = torch.rand((1, 3, 640, 640))
+    outputs = res(img)
+    for output in outputs:
+        print(output.shape)

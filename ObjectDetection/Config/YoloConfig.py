@@ -1,12 +1,4 @@
-class base_cfg:
-    n_anchors = 5
-    n_class = 5
-    img_size = 448
-    output_channel = n_anchors * (n_class + 5)
-    backbone_type = "darknet_53"
-    head_config = {}
-    neck_config = {}
-    activation_list=["LeakyReLU", 0.2]
+from Utils.BaseClass import base_cfg
 
 class yolov2_cfg(base_cfg):
     n_anchors = 5

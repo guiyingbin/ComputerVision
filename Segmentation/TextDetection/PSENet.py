@@ -3,6 +3,7 @@ import torch
 from Segmentation.Config.TextDetectionConfig import psenet_cfg
 from Segmentation.Utils.Layers import build_block
 from Classification.ResNet import resnet
+import torch.nn.functional as F
 
 
 class pseNet(nn.Module):
@@ -32,6 +33,7 @@ class pseNet(nn.Module):
         return build_block(head_config["head"], activation_list=self.cfg.head_activation_list)
 
     def forward(self, imgs):
+        _, _, H, W = imgs.shape
         f2, f3, f4, f5 = self.backbone(imgs)
         p5 = self.neck["P5"](f5)
         f4 = self.pre_layer[2](f4)
@@ -52,7 +54,9 @@ class pseNet(nn.Module):
         p3 = p3_up
         output = torch.cat([p2, p3, p4, p5], dim=1)
         output = self.head(output)
+        output = F.interpolate(output, size=(H, W))
         return output
+
 
 if __name__ == "__main__":
     psenet = pseNet()

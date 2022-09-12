@@ -50,6 +50,9 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
             block.add_module("{}{}".format(block_info[0], i), FPN(neck_config=block_info[1],
                                                                   channels=block_info[2],
                                                                   activation_list=activation_list))
+        if block_type == "ASF":
+            block.add_module("{}{}".format(block_info[0], i), AdaptiveScaleFusion(N=block_info[1],
+                                                                                  C=block_info[2]))
     return block
 
 
@@ -70,6 +73,58 @@ def build_activation(activation_list: list) -> nn:
         return nn.Tanh()
     else:
         return nn.Identity()
+
+
+class AdaptiveScaleFusion(nn.Module):
+    def __init__(self, N=4, C=1024):
+        """
+        the Adaptive Scale Fusion Module of DBNet++
+        :param N: the number of feature maps from different layers
+        :param C: the channels of feature maps
+        """
+        super(AdaptiveScaleFusion, self).__init__()
+        self.N = N
+        self.C = C
+        self.SA = SpatialAttention(input_channel=C, output_channel=N)
+        self.conv1 = nn.Conv2d(self.N*self.C, self.C, 3, 1, 1)
+
+    def forward(self, x):
+        """
+        :param x: shape is [B, N*C, H, W]
+        :return: shape is [B, N*C, H, W]
+        """
+        B, N_C, H, W = x.shape
+        x_part1 = self.conv1(x)
+        weights = self.SA(x_part1) #weights shape is [B, N, H, W]
+        weights = weights.unsqueeze(dim=2) #weights shape is [B, N, 1, H, W]
+        x = x.reshape(B, self.N, self.C, H, W)
+        output = x*weights
+        output = output.reshape(B, self.N*self.C, H, W)
+        return output
+
+
+class SpatialAttention(nn.Module):
+    def __init__(self, input_channel=4, output_channel=4):
+        """
+        the Spatial Attention Module of DBNet++
+        :param input_channel: the input channels of SA
+        :param output_channel: the output channels of SA
+        """
+        super(SpatialAttention, self).__init__()
+        self.conv_part1 = nn.Sequential(nn.Conv2d(1, 1, 1, 1, 0),
+                                        nn.ReLU(),
+                                        nn.Conv2d(1, 1, 3, 1, 1),
+                                        nn.Sigmoid())
+        self.conv_part2 = nn.Sequential(nn.Conv2d(input_channel, output_channel, 3, 1, 1),
+                                        nn.Sigmoid())
+
+    def forward(self, x:torch.FloatTensor):
+        x_part1 = torch.mean(input=x, dim=1)
+        x_part1 = x_part1.unsqueeze(dim=1)
+        x_part1 = self.conv_part1(x_part1)
+        x = x_part1 + x
+        output = self.conv_part2(x)
+        return output
 
 
 class FPN(nn.Module):
@@ -101,3 +156,10 @@ class FPN(nn.Module):
         p4 = p4_up
         p3 = p3_up
         return p2, p3, p4, p5
+
+
+if __name__ == "__main__":
+    a = torch.rand((1, 160*4, 80, 80))
+    asf = AdaptiveScaleFusion(N=4, C=160)
+    output = asf(a)
+    print(output.shape)

@@ -20,7 +20,8 @@ This part is mainly to reproduce various models, in order to better understand t
 ### 3.Segementation
 - Text Detection:
     - PSENet:[Shape Robust Text Detection With Progressive Scale Expansion Network](https://openaccess.thecvf.com/content_CVPR_2019/html/Wang_Shape_Robust_Text_Detection_With_Progressive_Scale_Expansion_Network_CVPR_2019_paper.html)
-    - DBNET:[Real-time Scene Text Detection with Differentiable Binarization](https://arxiv.org/pdf/1911.08947.pdf)
+    - DBNet:[Real-time Scene Text Detection with Differentiable Binarization](https://arxiv.org/pdf/1911.08947.pdf)
+    - DBNet++:[Real-Time Scene Text Detection with Differentiable Binarization and Adaptive Scale Fusion](https://arxiv.org/pdf/2202.10304.pdf)
 
 ### ToDo:
 - Process and postprocess module of Yolo

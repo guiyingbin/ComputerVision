@@ -61,3 +61,25 @@ class dbnet_cfg(psenet_cfg):
              ["ConvTranpose", 1024, n_class, 2, 2],
              ["BatchNorm", n_class]]
     }
+
+
+class dbnet_plusplus_cfg(dbnet_cfg):
+    n_class = 1
+    head_config = {
+        "pre_conv":
+            [["ASF", 4, 256]],
+        "prob_head":
+            [["Conv", 1024, 1024, 3, 1, 1],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, 1024, 2, 2],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, n_class, 2, 2],
+             ["BatchNorm", n_class]],
+        "threshold_head":
+            [["Conv", 1024, 1024, 3, 1, 1],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, 1024, 2, 2],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, n_class, 2, 2],
+             ["BatchNorm", n_class]]
+    }

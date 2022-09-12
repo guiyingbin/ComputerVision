@@ -61,3 +61,59 @@ class dbnet_cfg(psenet_cfg):
              ["ConvTranpose", 1024, n_class, 2, 2],
              ["BatchNorm", n_class]]
     }
+
+
+class dbnet_plusplus_cfg(dbnet_cfg):
+    n_class = 1
+    head_config = {
+        "pre_conv":
+            [["ASF", 4, 256]],
+        "prob_head":
+            [["Conv", 1024, 1024, 3, 1, 1],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, 1024, 2, 2],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, n_class, 2, 2],
+             ["BatchNorm", n_class]],
+        "threshold_head":
+            [["Conv", 1024, 1024, 3, 1, 1],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, 1024, 2, 2],
+             ["BatchNorm", 1024],
+             ["ConvTranpose", 1024, n_class, 2, 2],
+             ["BatchNorm", n_class]]
+    }
+
+
+class pannet_cfg(psenet_cfg):
+    backbone_type = "resnet_18"
+    channels = [64, 128, 256, 512] if backbone_type in ["resnet_18", "resnet_34"] else [256, 512, 1024, 2048]
+    n_Fr = 5
+    n_class = 1
+    neck_config = {
+        "FPEM_Block1":[["FPEM", channels, True]]+[["FPEM",channels, False]]*(n_Fr-1),
+        "FFM_Block": [["FFM"]]
+    }
+    head_config = {
+        "text_region_head":
+            [["Conv", 512, 512, 3, 1, 1],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, 512, 2, 2],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, n_class, 2, 2],
+             ["BatchNorm", n_class]],
+        "kernel_head":
+            [["Conv", 512, 512, 3, 1, 1],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, 512, 2, 2],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, n_class, 2, 2],
+             ["BatchNorm", n_class]],
+        "similarity_head":
+            [["Conv", 512, 512, 3, 1, 1],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, 512, 2, 2],
+             ["BatchNorm", 512],
+             ["ConvTranpose", 512, n_class, 2, 2],
+             ["BatchNorm", n_class]]
+    }

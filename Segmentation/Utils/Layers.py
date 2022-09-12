@@ -53,6 +53,14 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
         if block_type == "ASF":
             block.add_module("{}{}".format(block_info[0], i), AdaptiveScaleFusion(N=block_info[1],
                                                                                   C=block_info[2]))
+
+        if block_type == "FPEM":
+            block.add_module("{}{}".format(block_info[0], i), FeaturePyramidEnhancement(input_channels=block_info[1],
+                                                                                        pre_conv=block_info[2]))
+
+        if block_type == "FFM":
+            block.add_module("{}{}".format(block_info[0], i), FeatureFusion())
+
     return block
 
 
@@ -158,8 +166,88 @@ class FPN(nn.Module):
         return p2, p3, p4, p5
 
 
+class FeaturePyramidEnhancement(nn.Module):
+    def __init__(self, input_channels=None, pre_conv=True):
+        """
+        Feature Pyramid Enhancement Module of PANNet
+        :param input_channels:
+        """
+        super(FeaturePyramidEnhancement, self).__init__()
+        if input_channels is None:
+            input_channels = [256, 512, 1024, 2048]
+
+        self.input_channels = input_channels
+        self.upsample =  nn.UpsamplingBilinear2d(scale_factor=2)
+        self.conv_block_upsample = []
+        self.conv_block_downsample = []
+        self.is_preconv = pre_conv
+        if self.is_preconv:
+            self.pre_conv = [nn.Conv2d(input_channel, 128, 1, 1, 0) for input_channel in input_channels]
+
+        for input_channel in input_channels[1:]:
+            self.conv_block_upsample.append(nn.Sequential(nn.Conv2d(128,128,
+                                                                    groups=128,
+                                                                    kernel_size=3,
+                                                                    padding=1,
+                                                                    stride=1),
+                                                          nn.Conv2d(128, 128, 1, 1, 0),
+                                                          nn.BatchNorm2d(128),
+                                                          nn.ReLU()))
+            self.conv_block_downsample.append(nn.Sequential(nn.Conv2d(128, 128,
+                                                                    groups=128,
+                                                                    kernel_size=3,
+                                                                    padding=1,
+                                                                    stride=2),
+                                                          nn.Conv2d(128, 128, 1, 1, 0),
+                                                          nn.BatchNorm2d(128),
+                                                          nn.ReLU()))
+
+    def forward(self, x):
+        assert len(self.input_channels) == len(x)
+        f2, f3, f4, f5 = x
+        if self.is_preconv:
+            f2 = self.pre_conv[0](f2)
+            f3 = self.pre_conv[1](f3)
+            f4 = self.pre_conv[2](f4)
+            f5 = self.pre_conv[3](f5)
+
+        # Up-scale enhancement
+        p5 = f5
+        p5_up = self.upsample(p5)
+        p4 = self.conv_block_upsample[-1](p5_up+f4)
+        p4_up = self.upsample(p4)
+        p3 = self.conv_block_upsample[-2](p4_up+f3)
+        p3_up = self.upsample(p3)
+        p2 = self.conv_block_upsample[-3](p3_up+f2)
+
+        # Down-scale enhancement
+        o2 = p2
+        o3 = self.conv_block_downsample[-1](p3_up+o2)
+        o4 = self.conv_block_downsample[-2](p4_up+o3)
+        o5 = self.conv_block_downsample[-3](p5_up+o4)
+        return o2, o3, o4, o5
+
+
+class FeatureFusion(nn.Module):
+    def __init__(self):
+        super(FeatureFusion, self).__init__()
+        self.upsample_2x = nn.UpsamplingBilinear2d(scale_factor=2)
+        self.upsample_4x = nn.UpsamplingBilinear2d(scale_factor=4)
+        self.upsample_8x = nn.UpsamplingBilinear2d(scale_factor=8)
+
+    def forward(self, x):
+        o2, o3, o4, o5 = x
+        o5 = self.upsample_8x(o5)
+        o4 = self.upsample_4x(o4)
+        o3 = self.upsample_2x(o3)
+        output = torch.cat([o2, o3, o4, o5], dim=1)
+        return output
+
 if __name__ == "__main__":
-    a = torch.rand((1, 160*4, 80, 80))
-    asf = AdaptiveScaleFusion(N=4, C=160)
-    output = asf(a)
-    print(output.shape)
+    a = torch.rand((1, 256, 160, 160))
+    b = torch.rand((1, 512, 80, 80))
+    c = torch.rand((1, 1024, 40, 40))
+    d = torch.rand((1, 2048, 20, 20))
+    model = FeaturePyramidEnhancement()
+    o2, o3, o4, o5 = model([a,b,c,d])
+    print(o2.shape)

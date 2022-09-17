@@ -44,3 +44,24 @@ class baseTrainer():
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
+
+class baseTextRecognizer(torch.nn.Module):
+    def __init__(self, cfg):
+        super(baseTextRecognizer, self).__init__()
+        self.cfg = cfg
+        self.transformation = self.build_transformation(transformation_name=self.cfg.transformation_name)
+        self.feature_extractor = self.build_feature_extractor(feature_extractor_config=self.cfg.feature_extractor_config)
+        self.sequence_modeling = self.build_sequence_modeling(sequence_config=self.cfg.sequence_config)
+        self.prediction = self.build_prediction_layer(predict_config=self.cfg.predict_config)
+
+    def build_transformation(self, transformation_name):
+        pass
+
+    def build_feature_extractor(self, feature_extractor_config):
+        pass
+
+    def build_sequence_modeling(self, sequence_config):
+        pass
+
+    def build_prediction_layer(self, predict_config):
+        pass

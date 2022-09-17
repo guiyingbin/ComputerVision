@@ -23,7 +23,8 @@ class pseNet(nn.Module):
     def build_neck(self, neck_config):
         neck = []
         for neck_name, neck_block_config in neck_config.items():
-            neck_block_list = [[neck_name, neck_block_config, self.cfg.channels]]
+            if neck_name.startswith("FPN"):
+                neck_block_list = [["FPN", neck_block_config, self.cfg.channels]]
             neck.append(build_block(neck_block_list, activation_list=self.cfg.neck_activation_list))
 
         return neck

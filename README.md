@@ -27,6 +27,7 @@ This part is mainly to reproduce various models, in order to better understand t
     - DBNet:[Real-time Scene Text Detection with Differentiable Binarization](https://arxiv.org/pdf/1911.08947.pdf)
     - DBNet++:[Real-Time Scene Text Detection with Differentiable Binarization and Adaptive Scale Fusion](https://arxiv.org/pdf/2202.10304.pdf)
 
-### TODO:
+### TODO list:
 - Process and postprocess module of Yolo
 - Postprocess module fo PSENet
+- STN module of SRN

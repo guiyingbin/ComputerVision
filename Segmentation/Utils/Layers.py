@@ -136,13 +136,19 @@ class SpatialAttention(nn.Module):
 
 
 class FPN(nn.Module):
-    def __init__(self, neck_config, channels, activation_list=None):
+    def __init__(self, neck_config, channels, hidden_channel=256, activation_list=None):
+        """
+
+        :param neck_config:
+        :param channels:
+        :param activation_list:
+        """
         super(FPN, self).__init__()
         self.neck = {}
         for block_name, block_list in neck_config.items():
             self.neck[block_name] = build_block(block_list, activation_list=activation_list)
 
-        self.pre_layer = [nn.Conv2d(channels[i], 256, kernel_size=3, padding=1, stride=1) for i in range(0, 3)]
+        self.pre_layer = [nn.Conv2d(channels[i], hidden_channel, kernel_size=3, padding=1, stride=1) for i in range(0, 3)]
 
     def forward(self, f):
         f2, f3, f4, f5 = f

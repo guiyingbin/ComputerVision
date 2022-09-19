@@ -46,3 +46,17 @@ class srn_cfg():
         "n_block": 4,
         "n_max_len": 25
     }
+
+
+class dpan_cfg(srn_cfg):
+    predict_config = {
+        "name": "DPAN",
+        "n_class": 37,
+        "n_head": 8,
+        "d_k": 64,
+        "d_v": 64,
+        "d_model": 512,
+        "n_position": 1024,
+        "n_block": 4,
+        "n_max_len": 25
+    }

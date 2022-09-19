@@ -7,6 +7,10 @@ from Classification.Config.TextRecognizeConfig import srn_cfg
 
 class srn(baseTextRecognizer):
     def __init__(self, cfg=srn_cfg):
+        """
+        The Semantic reasoning network, the
+        :param cfg:
+        """
         super(srn, self).__init__(cfg)
 
     def build_transformation(self, transformation_name):

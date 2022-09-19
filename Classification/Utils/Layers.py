@@ -335,6 +335,107 @@ class GlobalSemanticReasoning(nn.Module):
         s_t = self.transformer_unit(e_t)
         return g_t, s_t
 
+class BidirectionalLanguageModelBlock(nn.Module):
+    def __init__(self, n_class=37, n_position=25, d_model=512, n_head=8):
+        """
+        Bidirectional Language Model in DPAN
+        :param n_class:
+        :param n_block:
+        :param n_position:
+        :param d_model:
+        """
+        super(BidirectionalLanguageModelBlock, self).__init__()
+        self.MHA_cross = MultiHeadAttention(n_head = n_head, d_k=n_position, d_v=n_position, d_model=d_model)
+        self.FF = FeedForward(input_channel=d_model, hidden_channel=d_model*4)
+        self.pe = PositionEncoding(d_model=d_model, n_position=n_position)
+        self.fc = nn.Sequential(nn.Linear(d_model, n_class),
+                                nn.Softmax(dim=2))
+        self.embbedding = nn.Embedding(n_class, d_model)
+
+    def forward(self, G, mask=None):
+        k = self.pe(G)
+        q = self.embbedding(self.fc(G).argmax(-1))
+        output = self.MHA_cross(q, k, k, mask)
+        output = self.FF(output)
+        return output
+
+
+class BidirectionalLanguageModel(nn.Module):
+    def __init__(self, n_class=37, n_position=25, d_model=512, n_head=8, n_block=4):
+        """
+        Bidirectional Language Model in DPAN
+        :param n_class:
+        :param n_block:
+        :param n_position:
+        :param d_model:
+        """
+        super(BidirectionalLanguageModel, self).__init__()
+        self.model = nn.ModuleList([BidirectionalLanguageModelBlock(n_head=n_head,
+                                                                    n_class=n_class,
+                                                                    n_position=n_position,
+                                                                    d_model=d_model)] * n_block)
+
+    def forward(self, x, mask=None):
+        for encoderLayer in self.model:
+            x = encoderLayer(x, mask)
+        return x
+
+
+class ParallelContextualAttention(nn.Module):
+    def __init__(self, n_class=37, n_block=4, n_position=25, d_model=512):
+        """
+        unofficial implemention of Parallel Contextual Attention Module in DPAN
+        :param n_class:
+        :param n_block:
+        :param n_position:
+        :param d_model:
+        """
+        super(ParallelContextualAttention, self).__init__()
+        self.projecton = nn.Linear(d_model, d_model)
+        self.blm = BidirectionalLanguageModel(n_class=n_class, n_block=n_block,
+                                              n_position=n_position, d_model=d_model)
+
+        self.fc = nn.Sequential(nn.Linear(d_model, n_class),
+                                nn.Softmax(dim=2))
+        self.embbedding = nn.Embedding(n_class, d_model)
+
+    def forward(self, G, mask=None):
+        g_t = self.projecton(G)
+        s_t = self.blm(g_t, mask)
+        qc = self.embbedding(self.fc(s_t).argmax(-1))
+        return s_t, qc
+
+
+class DPANDecoder(nn.Module):
+    def __init__(self, d_model=512, n_max_len=25, n_position=256, n_class=37, n_block=4):
+        """
+        The Parallel Positional Attention Module and Parallel Contextual Attention Module of DPAN
+        :param d_model:
+        :param n_max_len:
+        :param n_position:
+        :param n_class:
+        :param n_block:
+        """
+        super(DPANDecoder, self).__init__()
+        self.PVA = ParallelVisualAttention(d_model, n_max_len, n_position)
+        self.PCA = ParallelContextualAttention(n_class=n_class, n_block=n_block, n_position=n_max_len, d_model=d_model)
+        self.linear = nn.Sequential(nn.Linear(d_model, n_class),
+                                 nn.Softmax(dim=2))
+        self.SDP = ScaledDotProductAttention(temperature=np.power(d_model, 0.5))
+        self.fc1 = nn.Sequential(nn.Linear(d_model, n_class),
+                                 nn.Softmax(dim=2))
+        self.fc2 = nn.Sequential(nn.Linear(d_model, n_class),
+                                nn.Softmax(dim=2))
+
+    def forward(self, x, mask=None):
+        G1 = self.PVA(x)
+        pred1 = self.fc1(G1)
+        Qc, s_l = self.PCA(G1)
+        pred2 = self.fc2(Qc)
+        G2 = self.SDP(Qc, x, x, mask)
+        pred3 = self.linear(G2 + s_l)
+        return pred1, pred2, pred3
+
 
 class SRNDecoder(nn.Module):
     def __init__(self, d_model=512, n_max_len=25, n_position=256, n_class=37, n_block=4):
@@ -357,9 +458,12 @@ if __name__ == "__main__":
     TE = TransformerEncoder()
     PVA = ParallelVisualAttention()
     GRS = GlobalSemanticReasoning()
-    x = torch.rand((7, 256, dmodel))
 
+    PCA= ParallelContextualAttention()
+    x = torch.rand((7, 256, dmodel))
+    dpandecoder = DPANDecoder()
     # output = TE(x)
-    output = PVA(x)
-    pred1, s_t = GRS(output)
+    # output = PVA(x)
+    # pred1, s_t = PCA(output)
+    qc, s_t, f = dpandecoder(x)
     print(s_t.shape)

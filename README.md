@@ -11,6 +11,8 @@ This part is mainly to reproduce various models, in order to better understand t
     - DPAN:[Look Back Again: Dual Parallel Attention Network for Accurate and Robust Scene Text Recognition](https://dl.acm.org/doi/pdf/10.1145/3460426.3463674)
     - PARSeq:[Scene Text Recognition withPermuted Autoregressive Sequence Models](https://arxiv.org/pdf/2207.06966.pdf) (TODO)
     
+- Key Information Extract
+    - SDMGR:[Spatial Dual-Modality Graph Reasoning for Key Information Extraction](https://arxiv.org/abs/2103.14470) (TODO)
 ### 2.Object Detection
 - Yolo: 
     - YoloV1:[You Only Look Once:Unified, Real-Time Object Detection](http://arxiv.org/abs/1506.02640)
@@ -19,6 +21,9 @@ This part is mainly to reproduce various models, in order to better understand t
     - YoloV4:[YOLOv4: Optimal Speed and Accuracy of Object Detection](https://arxiv.org/abs/2004.10934)
     - YoloV5: No Paper, https://github.com/ultralytics/yolov5
     - YoloV7:[YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors](http://arxiv.org/abs/2207.02696)
+- Text Detection:
+    - EAST:[EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/pdf/1704.03155v2.pdf) (TODO)
+    - TextBoxes++:[A Single-Shot Oriented Scene Text Detector](https://arxiv.org/pdf/1801.02765.pdf) (TODO)
 
 ### 3.Segementation
 - Text Detection:

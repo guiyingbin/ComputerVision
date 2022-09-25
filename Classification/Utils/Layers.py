@@ -46,6 +46,9 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
         if block_type == "BottleNeck":
             block.add_module("{}{}".format(block_type, i), BottleNeck(*block_info[1:]))
 
+        if block_type == "UpNearest":
+            block.add_module("{}{}".format(block_type, i), nn.UpsamplingNearest2d(scale_factor=block_info[1]))
+
         if block_type == "FPN":
             block.add_module("{}{}".format(block_type, i), FPN(neck_config=block_info[1],
                                                                channels=block_info[2],

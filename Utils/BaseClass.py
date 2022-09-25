@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import random
-
+import torch.nn as nn
 
 class base_cfg:
     n_anchors = 5

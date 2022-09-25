@@ -22,8 +22,8 @@ This part is mainly to reproduce various models, in order to better understand t
     - YoloV5: No Paper, https://github.com/ultralytics/yolov5
     - YoloV7:[YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors](http://arxiv.org/abs/2207.02696)
 - Text Detection:
-    - EAST:[EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/pdf/1704.03155v2.pdf) (TODO)
-    - TextBoxes++:[A Single-Shot Oriented Scene Text Detector](https://arxiv.org/pdf/1801.02765.pdf) (TODO)
+    - EAST:[EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/pdf/1704.03155v2.pdf)
+    - TextBoxes++:[A Single-Shot Oriented Scene Text Detector](https://arxiv.org/pdf/1801.02765.pdf) 
 
 ### 3.Segementation
 - Text Detection:

@@ -18,84 +18,87 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
         if block_type == "FC":
             block.add_module("FC{}".format(i), nn.Linear(block_info[1], block_info[2]))
 
-        if block_type == "Conv":
+        elif block_type == "Conv":
             block.add_module("Conv{}".format(i), nn.Conv2d(in_channels=block_info[1],
                                                            out_channels=block_info[2],
                                                            kernel_size=block_info[3],
                                                            padding=block_info[4],
                                                            stride=block_info[5]))
-        if block_type == "MaxPool":
+        elif block_type == "MaxPool":
             block.add_module("MaxPool{}".format(i), nn.MaxPool2d(kernel_size=block_info[1],
                                                                  padding=block_info[2],
                                                                  stride=block_info[3]))
 
-        if block_type == "AvgPool":
+        elif block_type == "AvgPool":
             block.add_module("AvgPool{}".format(i), nn.AvgPool2d(kernel_size=block_info[1],
                                                                  stride=block_info[2]))
 
-        if block_type == "BatchNorm":
+        elif block_type == "BatchNorm":
             block.add_module("BatchNorm{}".format(i), nn.BatchNorm2d(num_features=block_info[1]))
             block.add_module("{}{}".format(activation_list[0], i), build_activation(activation_list))
-        """
-        The following are non-basic modules. When building non-basic modules, 
-        if you use build_block to build, do not form loop nesting
-        """
-        if block_type == "Residual":
+            """
+            The following are non-basic modules. When building non-basic modules, 
+            if you use build_block to build, do not form loop nesting
+            """
+        elif block_type == "Residual":
             block.add_module("{}{}".format(block_info[0], i), Residual(input_channel=block_info[1],
                                                                        mid_channel=block_info[2],
                                                                        activation_list=activation_list))
-        if block_type == "ConvSet_block":
+        elif block_type == "ConvSet_block":
             block.add_module("{}{}".format(block_info[0], i), ConvSet_block(input_channel=block_info[1],
                                                                             output_channel=block_info[2],
                                                                             n_block=block_info[3],
                                                                             activation_list=activation_list))
-        if block_type == "UpNearest":
+        elif block_type == "UpNearest":
             block.add_module("{}{}".format(block_info[0], i), nn.UpsamplingNearest2d(scale_factor=block_info[1]))
 
-        if block_type == "DarkNet_block":
+        elif block_type == "DarkNet_block":
             block.add_module("{}{}".format(block_info[0], i), DarkNet_block(input_channel=block_info[1],
                                                                             n_block=block_info[2],
                                                                             activation_list=activation_list))
-        if block_type == "CSPDarkNet_block":
+        elif block_type == "CSPDarkNet_block":
             block.add_module("{}{}".format(block_info[0], i), CSPDarkNet_block(input_channel=block_info[1],
                                                                                output_channel=block_info[2],
                                                                                n_block=block_info[3],
                                                                                csp_mode=block_info[4],
                                                                                activation_list=activation_list))
-        if block_type == "SPP":
+        elif block_type == "SPP":
             block.add_module("{}{}".format(block_info[0], i), SPP(input_channel=block_info[1],
                                                                   activation_list=activation_list))
 
-        if block_type == "SPP_CSP_Conv":
+        elif block_type == "SPP_CSP_Conv":
             block.add_module("{}{}".format(block_info[0], i), SPP_CSP_Conv(input_channel=block_info[1],
                                                                            activation_list=activation_list))
 
-        if block_type == "CSP1_block":
+        elif block_type == "CSP1_block":
             block.add_module("{}{}".format(block_info[0], i), CSP1_block(input_channel=block_info[1],
                                                                          output_channel=block_info[2],
                                                                          n_block=block_info[3],
                                                                          activation_list=activation_list))
-        if block_type == "CSP2_block":
+        elif block_type == "CSP2_block":
             block.add_module("{}{}".format(block_info[0], i), CSP2_block(input_channel=block_info[1],
                                                                          output_channel=block_info[2],
                                                                          n_block=block_info[3],
                                                                          activation_list=activation_list))
-        if block_type == "Focus":
+        elif block_type == "Focus":
             block.add_module("{}{}".format(block_info[0], i), Focus(input_channel=block_info[1],
                                                                     output_channel=block_info[2],
                                                                     activation_list=activation_list))
 
-        if block_type == "PAN":
+        elif block_type == "PAN":
             block.add_module("{}{}".format(block_info[0], i), PAN(block_info[1], block_info[2]))
 
-        if block_type == "ELAN":
+        elif block_type == "ELAN":
             block.add_module("{}{}".format(block_info[0], i), ELAN(block_info[1], block_info[2]))
 
-        if block_type == "MP_block":
+        elif block_type == "MP_block":
             block.add_module("{}{}".format(block_info[0], i), MP_block(block_info[1], block_info[2]))
 
-        if block_type == "RepConv":
+        elif block_type == "RepConv":
             block.add_module("{}{}".format(block_info[0], i), RepConv(block_info[1]))
+
+        else:
+            block.add_module("Identity{}".format(i), nn.Identity())
     return block
 
 

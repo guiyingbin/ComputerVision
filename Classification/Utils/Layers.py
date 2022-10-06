@@ -54,6 +54,18 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
                                                                channels=block_info[2],
                                                                hidden_channel=block_info[3],
                                                                activation_list=activation_list))
+
+        if block_type == "RepBlock":
+            block.add_module("{}{}".format(block_type, i), RepBlock(in_channels=block_info[1],
+                                                                    output_channels=block_info[2],
+                                                                    stride=block_info[3],
+                                                                    identity=block_info[4],
+                                                                    activation_list=activation_list))
+        if block_type == "DenseBlock":
+            block.add_module("{}{}".format(block_type, i), DenseBlock(in_channels=block_info[1],
+                                                                      output_channels=block_info[2],
+                                                                      n_block=block_info[3],
+                                                                      activation_list=activation_list))
     return block
 
 
@@ -74,6 +86,84 @@ def build_activation(activation_list: list) -> nn:
         return nn.Tanh()
     else:
         return nn.Identity()
+
+
+class ConvBlock(nn.Module):
+    def __init__(self, in_channels, output_channels, activation_list=["ReLU"]):
+        super(ConvBlock, self).__init__()
+        self.act = build_activation(activation_list)
+        self.model = nn.Sequential(nn.BatchNorm2d(in_channels),
+                                   self.act,
+                                   nn.Conv2d(in_channels, output_channels, 1, 1, 0),
+                                   nn.BatchNorm2d(output_channels),
+                                   self.act,
+                                   nn.Conv2d(output_channels, output_channels, 3, 1, 1)
+                                   )
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class DenseBlock(nn.Module):
+    def __init__(self, in_channels, output_channels, n_block, activation_list=["ReLU"]):
+        """
+        The basic Block of DenseNet
+        :param in_channels:
+        :param output_channels:
+        """
+        super(DenseBlock, self).__init__()
+        self.model = []
+        self.model.append(ConvBlock(in_channels, output_channels, activation_list))
+        for i in range(n_block - 1):
+            self.model.append(ConvBlock(in_channels + output_channels * (i + 1),
+                                        output_channels,
+                                        activation_list))
+
+    def forward(self, x):
+        output = [x]
+        for layer in self.model:
+            temp = torch.cat(output, dim=1)
+            latent = layer(temp)
+            output.append(latent)
+        return torch.cat(output, dim=1)
+
+
+class RepBlock(nn.Module):
+    def __init__(self, in_channels, output_channels, stride, identity=True, activation_list=["ReLU"]):
+        """
+        The basic block of RepVGG
+        :param in_channels: input channels
+        :param output_channels: output channels
+        :param stride:
+        :param identity: whether to use the residual operation
+        """
+        super(RepBlock, self).__init__()
+        self.con_3x3 = nn.Conv2d(in_channels=in_channels,
+                                 out_channels=output_channels,
+                                 kernel_size=3,
+                                 padding=1,
+                                 stride=stride)
+        self.con_1x1 = nn.Conv2d(in_channels=in_channels,
+                                 out_channels=output_channels,
+                                 kernel_size=1,
+                                 padding=0,
+                                 stride=stride)
+
+        self.identity = identity
+        self.act = build_activation(activation_list)
+        self.bn = nn.Sequential(nn.BatchNorm2d(output_channels),
+                                self.act)
+
+    def forward(self, x):
+        o1 = self.bn(self.con_3x3(x))
+        if self.training:
+            o2 = self.bn(self.con_1x1(x))
+            if not self.identity:
+                return o2 + o1
+            x = self.bn(x)
+            return o1 + o2 + x
+        else:
+            return o1
 
 
 class BottleNeck(nn.Module):
@@ -338,6 +428,7 @@ class GlobalSemanticReasoning(nn.Module):
         s_t = self.transformer_unit(e_t)
         return g_t, s_t
 
+
 class BidirectionalLanguageModelBlock(nn.Module):
     def __init__(self, n_class=37, n_position=25, d_model=512, n_head=8):
         """
@@ -348,8 +439,8 @@ class BidirectionalLanguageModelBlock(nn.Module):
         :param d_model:
         """
         super(BidirectionalLanguageModelBlock, self).__init__()
-        self.MHA_cross = MultiHeadAttention(n_head = n_head, d_k=n_position, d_v=n_position, d_model=d_model)
-        self.FF = FeedForward(input_channel=d_model, hidden_channel=d_model*4)
+        self.MHA_cross = MultiHeadAttention(n_head=n_head, d_k=n_position, d_v=n_position, d_model=d_model)
+        self.FF = FeedForward(input_channel=d_model, hidden_channel=d_model * 4)
         self.pe = PositionEncoding(d_model=d_model, n_position=n_position)
         self.fc = nn.Sequential(nn.Linear(d_model, n_class),
                                 nn.Softmax(dim=2))
@@ -423,12 +514,12 @@ class DPANDecoder(nn.Module):
         self.PVA = ParallelVisualAttention(d_model, n_max_len, n_position)
         self.PCA = ParallelContextualAttention(n_class=n_class, n_block=n_block, n_position=n_max_len, d_model=d_model)
         self.linear = nn.Sequential(nn.Linear(d_model, n_class),
-                                 nn.Softmax(dim=2))
+                                    nn.Softmax(dim=2))
         self.SDP = ScaledDotProductAttention(temperature=np.power(d_model, 0.5))
         self.fc1 = nn.Sequential(nn.Linear(d_model, n_class),
                                  nn.Softmax(dim=2))
         self.fc2 = nn.Sequential(nn.Linear(d_model, n_class),
-                                nn.Softmax(dim=2))
+                                 nn.Softmax(dim=2))
 
     def forward(self, x, mask=None):
         G1 = self.PVA(x)
@@ -455,18 +546,6 @@ class SRNDecoder(nn.Module):
 
 
 if __name__ == "__main__":
-    dk = 128
-    dv = 256
-    dmodel = 512
-    TE = TransformerEncoder()
-    PVA = ParallelVisualAttention()
-    GRS = GlobalSemanticReasoning()
-
-    PCA= ParallelContextualAttention()
-    x = torch.rand((7, 256, dmodel))
-    dpandecoder = DPANDecoder()
-    # output = TE(x)
-    # output = PVA(x)
-    # pred1, s_t = PCA(output)
-    qc, s_t, f = dpandecoder(x)
-    print(s_t.shape)
+    dense_block = DenseBlock(32, 32, 6)
+    x = torch.randn((3, 32, 224, 224))
+    print(dense_block(x).shape)

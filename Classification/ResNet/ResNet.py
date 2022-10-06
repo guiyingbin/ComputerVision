@@ -4,7 +4,7 @@ from Classification.Utils.Layers import build_block
 
 
 class resnet(nn.Module):
-    def __init__(self, model_type="resnet_50", activation_list=None):
+    def __init__(self, cfg=resnet_cfg, model_type="resnet_50", activation_list=None):
         """
         ResNet Model
         :param model_type:
@@ -17,10 +17,10 @@ class resnet(nn.Module):
         self.activation_list = activation_list
         self.model_type = model_type
 
-        model_config = resnet_cfg[model_type]
-        self.resnet_model = self.build_resnet(model_config)
+        model_config = cfg[model_type]
+        self.model = self.build_model(model_config)
 
-    def build_resnet(self, model_config):
+    def build_model(self, model_config):
         model = self.build_multi_output_model(model_config, ["block3", "block5", "block7"])
         return model
 
@@ -36,7 +36,7 @@ class resnet(nn.Module):
         return model
 
     def forward(self, img):
-        P2, P3, P4, P5 = self.resnet_model
+        P2, P3, P4, P5 = self.model
         output1 = P2(img)
         output2 = P3(output1)
         output3 = P4(output2)

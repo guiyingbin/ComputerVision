@@ -54,6 +54,13 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
                                                                channels=block_info[2],
                                                                hidden_channel=block_info[3],
                                                                activation_list=activation_list))
+
+        if block_type == "RepBlock":
+            block.add_module("{}{}".format(block_type, i), RepBlock(in_channels=block_info[1],
+                                                                    output_channels=block_info[2],
+                                                                    stride=block_info[3],
+                                                                    identity=block_info[4],
+                                                                    activation_list=activation_list))
     return block
 
 
@@ -74,6 +81,44 @@ def build_activation(activation_list: list) -> nn:
         return nn.Tanh()
     else:
         return nn.Identity()
+
+
+class RepBlock(nn.Module):
+    def __init__(self, in_channels, output_channels, stride, identity=True, activation_list=["ReLU"]):
+        """
+        The basic block of RepVGG
+        :param in_channels: input channels
+        :param output_channels: output channels
+        :param stride:
+        :param identity: whether to use the residual operation
+        """
+        super(RepBlock, self).__init__()
+        self.con_3x3 = nn.Conv2d(in_channels=in_channels,
+                                 out_channels=output_channels,
+                                 kernel_size=3,
+                                 padding=1,
+                                 stride=stride)
+        self.con_1x1 = nn.Conv2d(in_channels=in_channels,
+                                 out_channels=output_channels,
+                                 kernel_size=1,
+                                 padding=0,
+                                 stride=stride)
+
+        self.identity = identity
+        self.act = build_activation(activation_list)
+        self.bn = nn.Sequential(nn.BatchNorm2d(output_channels),
+                                      self.act)
+
+    def forward(self, x):
+        o1 = self.bn(self.con_3x3(x))
+        if self.training:
+            o2 = self.bn(self.con_1x1(x))
+            if not self.identity:
+                return o2+o1
+            x = self.bn(x)
+            return o1+o2+x
+        else:
+            return o1
 
 
 class BottleNeck(nn.Module):

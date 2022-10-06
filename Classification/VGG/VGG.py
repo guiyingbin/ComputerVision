@@ -4,12 +4,12 @@ from Classification.Utils.Layers import build_block
 
 
 class vgg(nn.Module):
-    def __init__(self, model_type="vgg_16", activation_list=None):
+    def __init__(self, cfg=vgg_cfg, model_type="vgg_16", activation_list=None):
         super(vgg, self).__init__()
         if activation_list is None:
             activation_list = ["ReLU"]
         self.activation_list = activation_list
-        self.model = self.build_model(vgg_cfg[model_type])
+        self.model = self.build_model(cfg[model_type])
 
     def build_model(self, model_config):
         model = self.build_multi_output_model(model_config, ["block2", "block3", "block4"])

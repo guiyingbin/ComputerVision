@@ -26,6 +26,7 @@ This part is mainly to reproduce various models, in order to better understand t
 
 - Face Recognition
     - DeepFace:[DeepFace: Closing the Gap to Human-Level Performance in Face Verification](https://openaccess.thecvf.com/content_cvpr_2014/papers/Taigman_DeepFace_Closing_the_2014_CVPR_paper.pdf)
+    - DeepID:[Deep Learning Face Representation from Predicting 10,000 Classes](https://openaccess.thecvf.com/content_cvpr_2014/papers/Sun_Deep_Learning_Face_2014_CVPR_paper.pdf)
 ### 2.Object Detection
 - RCNN(TODO):
     - R-CNN:[Rich feature hierarchies for accurate object detection and semantic segmentation](https://openaccess.thecvf.com/content_cvpr_2014/papers/Girshick_Rich_Feature_Hierarchies_2014_CVPR_paper.pdf) 

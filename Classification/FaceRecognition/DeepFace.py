@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 
-class deepface(nn.Module):
+class deepFace(nn.Module):
     def __init__(self):
         """
         Implemention of DeepFace
@@ -9,7 +9,7 @@ class deepface(nn.Module):
         1. An effective DNN(a simple network)
         2. An effective face alignment method
         """
-        super(deepface, self).__init__()
+        super(deepFace, self).__init__()
         self.model = self.build_model()
 
     def face_alignment(self, x):
@@ -47,5 +47,5 @@ class deepface(nn.Module):
 if __name__ == "__main__":
     import torch
     x = torch.rand((1, 3, 152, 152))
-    df = deepface()
+    df = deepFace()
     print(df(x).shape)

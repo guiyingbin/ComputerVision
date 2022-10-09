@@ -4,14 +4,16 @@ import torch
 
 
 class deepID(deepFace):
-    def __init__(self, n_convnet=60):
+    def __init__(self, n_convnet=60, n_class=20):
         """
         In DeepID, 60 ConvNets is trained.Features are extracted from 60 face patches with ten regions, three scales, and RGB or gray
         channels.  Each ConvNets extracts two 160-dimensional DeepID vectors from a particular patch and its horizontally flipped counterpart
         """
         self.n_convnet = n_convnet
+        self.n_class = n_class
         super(deepID, self).__init__()
         self.model = self.build_model()
+        self.recognition_head = nn.Linear(self.n_convnet*160*2, self.n_class)
 
     def build_model(self):
         model = []
@@ -40,7 +42,13 @@ class deepID(deepFace):
             flip_img = torch.flip(img, dims=[3])
             output.append(model(flip_img).reshape(B, -1))
 
-        return torch.cat(output, dim=1)
+        return output
+
+    def get_recognition_pred(self, imgs):
+        features = self.forward(imgs)
+        features = torch.cat(features, dim=1)
+        cls_logit = self.recognition_head(features)
+        return cls_logit
 
 
 if __name__ == "__main__":
@@ -48,4 +56,4 @@ if __name__ == "__main__":
     img = torch.rand((3, 3, 39, 39))
     x = [img]*60
     df = deepID(n_convnet=60)
-    print(df(x).shape)
+    print(df.get_recognition_pred(x).shape)

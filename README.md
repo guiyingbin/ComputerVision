@@ -3,6 +3,8 @@ This part is mainly to reproduce various models, in order to better understand t
 
 ### 1.Classification
 - Vision Transformer
+    - ViT:[An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
+    - Swin Transformer:[Swin Transformer: Hierarchical Vision Transformer using Shifted Windows](https://openaccess.thecvf.com/content/ICCV2021/papers/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper.pdf) (TODO)
 - ResNet:
     - ResNet18, ResNet34, ResNet50, ResNet101, ResNet154:[Deep Residual Learning for Image Recognition](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html)
     - DenseNet121, DenseNet169, DenseNet201, DenseNet264:[Densely connected convolutional networks](https://arxiv.org/pdf/2101.03697.pdf) 
@@ -14,6 +16,8 @@ This part is mainly to reproduce various models, in order to better understand t
     - MobileNet:[Mobilenets: Efficient convolutional neural networks for mobile vision applications](https://arxiv.org/abs/1704.04861)
     - EfficientNet:[EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks](https://arxiv.org/abs/1905.11946)
     - EfficientNetV2:[EfficientNetV2: Smaller Models and Faster Training](https://arxiv.org/abs/2104.00298)
+    - TinyNet:[Model Rubik’s Cube: Twisting Resolution, Depth and Width for TinyNets](https://arxiv.org/pdf/2010.14819.pdf)
+    
 - Text Recognize: 
     The context-aware model will not be reproduced in the short term
     - CRNN:[An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition](https://arxiv.org/abs/1507.05717)
@@ -28,6 +32,8 @@ This part is mainly to reproduce various models, in order to better understand t
     - DeepFace:[DeepFace: Closing the Gap to Human-Level Performance in Face Verification](https://openaccess.thecvf.com/content_cvpr_2014/papers/Taigman_DeepFace_Closing_the_2014_CVPR_paper.pdf)
     - DeepID:[Deep Learning Face Representation from Predicting 10,000 Classes](https://openaccess.thecvf.com/content_cvpr_2014/papers/Sun_Deep_Learning_Face_2014_CVPR_paper.pdf)
     - DeepID2:[Deep Learning Face Representation by Joint Identification-Verification](https://proceedings.neurips.cc/paper/2014/hash/e5e63da79fcd2bebbd7cb8bf1c1d0274-Abstract.html)
+    - VarGFaceNet:[VarGFaceNet: An Efficient Variable Group Convolutional Neural Network for Lightweight Face Recognition](https://arxiv.org/pdf/1910.04985v4.pdf)
+    
 ### 2.Object Detection
 - RCNN(TODO):
     - R-CNN:[Rich feature hierarchies for accurate object detection and semantic segmentation](https://openaccess.thecvf.com/content_cvpr_2014/papers/Girshick_Rich_Feature_Hierarchies_2014_CVPR_paper.pdf) 

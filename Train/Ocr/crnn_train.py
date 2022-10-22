@@ -26,6 +26,7 @@ class Trainer(baseTrainer):
     def train_one_epoch(self, dataloader, is_train=True):
         losses = AverageMeter()
         pbar = tqdm(dataloader, total=len(dataloader))
+        self.optimzer.zero_grad()
         for imgs, idxs in pbar:
             imgs = imgs.to(self.device)
             label_str = self.dataframe.iloc[idxs.type(torch.int32).tolist(), 1].values
@@ -53,6 +54,9 @@ class Trainer(baseTrainer):
                     loss = self.criterion(preds.cpu(), labels, input_lengths, target_lengths)
                     losses.update(loss.item(), n=N)
                 # print("val loss:{}".format(loss.item()))
+            if is_train:
+                loss.backward()
+                self.optimzer.step()
             pbar.set_postfix(loss=losses.get_avg())
 
     def train_fold(self, fold):

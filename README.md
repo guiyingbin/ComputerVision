@@ -21,6 +21,7 @@ This part is mainly to reproduce various models, in order to better understand t
 - Text Recognize: 
     The context-aware model will not be reproduced in the short term
     - CRNN:[An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition](https://arxiv.org/abs/1507.05717)
+    - SATRN:[On Recognizing Texts of Arbitrary Shapes with 2D Self-Attention](https://www.notion.so/On-Recognizing-Texts-of-Arbitrary-Shapes-with-2D-Self-Attention-09e4a80c550a449384ded2895b4292df)
     - SRN:[Towards Accurate Scene Text Recognition with Semantic Reasoning Networks](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yu_Towards_Accurate_Scene_Text_Recognition_With_Semantic_Reasoning_Networks_CVPR_2020_paper.pdf)
     - DPAN:[Look Back Again: Dual Parallel Attention Network for Accurate and Robust Scene Text Recognition](https://dl.acm.org/doi/pdf/10.1145/3460426.3463674)
     - PARSeq:[Scene Text Recognition withPermuted Autoregressive Sequence Models](https://arxiv.org/pdf/2207.06966.pdf) (Context-Aware Model)

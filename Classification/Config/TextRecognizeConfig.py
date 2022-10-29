@@ -60,3 +60,76 @@ class dpan_cfg(srn_cfg):
         "n_block": 4,
         "n_max_len": 25
     }
+
+class trba_cfg():
+    densenet_cfg = {
+        "densenet_121": {
+            "stage1": [["Conv", 3, 32, 7, 3, 2],
+                       ["BatchNorm", 32],
+                       ["MaxPool", 3, 1, (2, 2)]],
+            "stage2": [["DenseBlock", 32, 32, 6],
+                       ["Conv", 224, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage3": [["DenseBlock", 32, 32, 12],
+                       ["Conv", 416, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage4": [["DenseBlock", 32, 32, 24],
+                       ["Conv", 800, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage5": [["DenseBlock", 32, 32, 16]],
+        },
+        "densenet_169": {
+            "stage1": [["Conv", 3, 32, 7, 3, 2],
+                       ["BatchNorm", 32],
+                       ["MaxPool", 3, 1, (2, 2)]],
+            "stage2": [["DenseBlock", 32, 32, 6],
+                       ["Conv", 224, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage3": [["DenseBlock", 32, 32, 12],
+                       ["Conv", 416, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage4": [["DenseBlock", 32, 32, 32],
+                       ["Conv", 1056, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage5": [["DenseBlock", 32, 32, 32]],
+        },
+        "densenet_201": {
+            "stage1": [["Conv", 3, 32, 7, 3, 2],
+                       ["BatchNorm", 32],
+                       ["MaxPool", 3, 1, 2]],
+            "stage2": [["DenseBlock", 32, 32, 6],
+                       ["Conv", 224, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage3": [["DenseBlock", 32, 32, 12],
+                       ["Conv", 416, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage4": [["DenseBlock", 32, 32, 48],
+                       ["Conv", 1568, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage5": [["DenseBlock", 32, 32, 32]],
+        },
+        "densenet_264": {
+            "stage1": [["Conv", 3, 32, 7, 3, 2],
+                       ["BatchNorm", 32],
+                       ["MaxPool", 3, 1, 2]],
+            "stage2": [["DenseBlock", 32, 32, 6],
+                       ["Conv", 224, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage3": [["DenseBlock", 32, 32, 12],
+                       ["Conv", 416, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage4": [["DenseBlock", 32, 32, 64],
+                       ["Conv", 2080, 32, 1, 0, 1],
+                       ["MaxPool", 3, 1, (2, 1)]],
+            "stage5": [["DenseBlock", 32, 32, 48]],
+        }
+    }
+    character_path = r"E:\Dataset\OCR_Dataset\char_std_5990.txt"
+    max_length = 64
+    input_size = (60, 256)
+    model_name = "densenet_121"
+    hidden_size = 256
+    seq_input_size = 544 * 2
+    n_class = 5990
+    n_fiducial = 20
+    input_channels = 3

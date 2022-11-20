@@ -19,13 +19,12 @@ This part is mainly to reproduce various models, in order to better understand t
     - TinyNet:[Model Rubik’s Cube: Twisting Resolution, Depth and Width for TinyNets](https://arxiv.org/pdf/2010.14819.pdf)
     
 - Text Recognize: 
-    The context-aware model will not be reproduced in the short term
     - CRNN:[An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition](https://arxiv.org/abs/1507.05717)
     - TRBA:[What Is Wrong With Scene Text Recognition Model Comparisons?Dataset and Model Analysis](https://arxiv.org/abs/1904.01906)
     - SATRN:[On Recognizing Texts of Arbitrary Shapes with 2D Self-Attention](https://www.notion.so/On-Recognizing-Texts-of-Arbitrary-Shapes-with-2D-Self-Attention-09e4a80c550a449384ded2895b4292df)
     - SRN:[Towards Accurate Scene Text Recognition with Semantic Reasoning Networks](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yu_Towards_Accurate_Scene_Text_Recognition_With_Semantic_Reasoning_Networks_CVPR_2020_paper.pdf)
     - DPAN:[Look Back Again: Dual Parallel Attention Network for Accurate and Robust Scene Text Recognition](https://dl.acm.org/doi/pdf/10.1145/3460426.3463674)
-    - PARSeq:[Scene Text Recognition withPermuted Autoregressive Sequence Models](https://arxiv.org/pdf/2207.06966.pdf) (Context-Aware Model)
+    - PARSeq:[Scene Text Recognition withPermuted Autoregressive Sequence Models](https://arxiv.org/pdf/2207.06966.pdf)
     
 - Key Information Extract
     - SDMGR:[Spatial Dual-Modality Graph Reasoning for Key Information Extraction](https://arxiv.org/abs/2103.14470) (TODO)
@@ -65,7 +64,3 @@ This part is mainly to reproduce various models, in order to better understand t
     - FCN:[Fully Convolutional Networks for Semantic Segmentation](https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html)
     - SegNet:[Segnet: A deep convolutional encoder-decoder architecture for image segmentation](https://ieeexplore.ieee.org/abstract/document/7803544)
     - U-Net:[U-Net: Convolutional Networks for Biomedical Image Segmentation](https://link.springer.com/content/pdf/10.1007/978-3-319-24574-4_28.pdf)
-### Other TODO list:
-- Process and postprocess module of Yolo
-- Postprocess module fo PSENet
-- STN module of SRN

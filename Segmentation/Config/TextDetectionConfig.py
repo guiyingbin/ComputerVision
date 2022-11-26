@@ -7,6 +7,7 @@ Configuration of text detection model
 from Utils.BaseClass import base_cfg
 
 class psenet_cfg(base_cfg):
+    pretrained = False
     n_anchors = 5
     n_class = 5
     output_channel = n_anchors*(n_class+5)

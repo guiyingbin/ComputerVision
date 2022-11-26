@@ -51,6 +51,8 @@ This part is mainly to reproduce various models, in order to better understand t
 - Text Detection:
     - EAST:[EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/pdf/1704.03155v2.pdf)
     - TextBoxes++:[A Single-Shot Oriented Scene Text Detector](https://arxiv.org/pdf/1801.02765.pdf) 
+- Face Detection:
+    - CenterFace:[CenterFace: Joint Face Detection and Alignment Using Face as Point](https://arxiv.org/abs/1911.03599)
 - Detetion Block:
     - SPP:[Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition](https://ieeexplore.ieee.org/abstract/document/7005506)
     - FPN:[Feature Pyramid Networks for Object Detection](https://openaccess.thecvf.com/content_cvpr_2017/html/Lin_Feature_Pyramid_Networks_CVPR_2017_paper.html)

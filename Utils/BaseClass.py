@@ -65,3 +65,19 @@ class baseTextRecognizer(torch.nn.Module):
 
     def build_prediction_layer(self, predict_config):
         pass
+
+class BaseInference():
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def preprocess(self, *args,  **kwargs):
+        pass
+
+    def forward(self, *args,  **kwargs):
+        pass
+
+    def __call__(self, *args,  **kwargs):
+        pass
+
+    def postprocess(self, *args,  **kwargs):
+        pass

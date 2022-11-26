@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import torch
 import torch.nn as nn
+from Segmentation.Utils.Layers import FPN
 
 
 def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) -> nn:
@@ -96,7 +97,10 @@ def build_block(block_list: list, activation_list: list = ["LeakyReLU", 0.2]) ->
 
         elif block_type == "RepConv":
             block.add_module("{}{}".format(block_info[0], i), RepConv(block_info[1]))
-
+        elif block_type == "FPN_3":
+            block.add_module("{}{}".format(block_info[0], i), FPN_3Layer(neck_config=block_info[1],
+                                                                         channels=block_info[2],
+                                                                         activation_list=activation_list))
         else:
             block.add_module("Identity{}".format(i), nn.Identity())
     return block
@@ -526,11 +530,10 @@ class RepConv(nn.Module):
             x1 = self.conv_part1(x)
             x2 = self.conv_part2(x)
             x3 = self.part3(x)
-            x = x1+x2+x3
+            x = x1 + x2 + x3
         else:
             x = self.conv_part1(x)
         return x
-
 
 
 class PAN(nn.Module):
@@ -578,6 +581,25 @@ class PAN(nn.Module):
             temp = torch.cat([x[i + 1], C_i_downsample], dim=1)
             output.append(self.conv_set[i](temp))
         return output
+
+
+class FPN_3Layer(FPN):
+    def __init__(self, neck_config, channels, hidden_channel=256, activation_list=None):
+        super(FPN_3Layer, self).__init__(neck_config, channels, hidden_channel, activation_list)
+
+    def forward(self, f):
+        f2, f3, f4 = f
+        p4 = self.neck["P4"](f4)
+        f3 = self.pre_layer[1](f3)
+        p4_up = self.neck["P4_up"](p4)
+        p3 = self.neck["P3"](p4_up + f3)
+        f2 = self.pre_layer[0](f2)
+        p4_up = self.neck["P3_up"](p4_up)
+        p3_up = self.neck["P3_up"](p3)
+        p2 = self.neck["P2"](p3_up + f2)
+        p4 = p4_up
+        p3 = p3_up
+        return p2, p3, p4
 
 
 if __name__ == "__main__":

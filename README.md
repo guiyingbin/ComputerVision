@@ -48,6 +48,7 @@ This part is mainly to reproduce various models, in order to better understand t
     - YoloV4:[YOLOv4: Optimal Speed and Accuracy of Object Detection](https://arxiv.org/abs/2004.10934)
     - YoloV5: No Paper, https://github.com/ultralytics/yolov5
     - YoloV7:[YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors](http://arxiv.org/abs/2207.02696)
+    - Yolo-Pose:[YOLO-Pose: Enhancing YOLO for Multi Person Pose Estimation Using Object Keypoint Similarity Loss](https://arxiv.org/abs/2204.06806)
 - Text Detection:
     - EAST:[EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/pdf/1704.03155v2.pdf)
     - TextBoxes++:[A Single-Shot Oriented Scene Text Detector](https://arxiv.org/pdf/1801.02765.pdf) 
@@ -66,3 +67,8 @@ This part is mainly to reproduce various models, in order to better understand t
     - FCN:[Fully Convolutional Networks for Semantic Segmentation](https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html)
     - SegNet:[Segnet: A deep convolutional encoder-decoder architecture for image segmentation](https://ieeexplore.ieee.org/abstract/document/7803544)
     - U-Net:[U-Net: Convolutional Networks for Biomedical Image Segmentation](https://link.springer.com/content/pdf/10.1007/978-3-319-24574-4_28.pdf)
+
+### 4.Video Analysis
+- Object Detection
+    - Bottleneck-LSTM:[Mobile Video Object Detection with Temporally-Aware Feature Maps](https://openaccess.thecvf.com/content_cvpr_2018/papers/Liu_Mobile_Video_Object_CVPR_2018_paper.pdf)
+    

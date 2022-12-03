@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 from Segmentation.Config.TextDetectionConfig import psenet_cfg
 from Segmentation.Utils.Layers import build_block
-from Classification.ResNet import resnet
+from Classification.ResNet.ResNet import resnet
 import torch.nn.functional as F
 
 

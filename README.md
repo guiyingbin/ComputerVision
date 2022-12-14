@@ -71,4 +71,6 @@ This part is mainly to reproduce various models, in order to better understand t
 ### 4.Video Analysis
 - Object Detection
     - Bottleneck-LSTM:[Mobile Video Object Detection with Temporally-Aware Feature Maps](https://openaccess.thecvf.com/content_cvpr_2018/papers/Liu_Mobile_Video_Object_CVPR_2018_paper.pdf)
+- Action Recognition
+    - DeepVideo:[Large-scale Video Classification with Convolutional Neural Networks](https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Karpathy_Large-scale_Video_Classification_2014_CVPR_paper.pdf)
     

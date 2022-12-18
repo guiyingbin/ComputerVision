@@ -74,3 +74,4 @@ This part is mainly to reproduce various models, in order to better understand t
 - Action Recognition
     - DeepVideo:[Large-scale Video Classification with Convolutional Neural Networks](https://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Karpathy_Large-scale_Video_Classification_2014_CVPR_paper.pdf)
     - TDD:[Action Recognition with Trajectory-Pooled Deep-Convolutional Descriptors](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Wang_Action_Recognition_With_2015_CVPR_paper.pdf)
+    - TSN:[Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://link.springer.com/content/pdf/10.1007/978-3-319-46484-8_2.pdf?pdf=inline%20link)

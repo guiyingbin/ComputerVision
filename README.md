@@ -4,7 +4,8 @@ This part is mainly to reproduce various models, in order to better understand t
 ### 1.Classification
 - Vision Transformer
     - ViT:[An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
-    - Swin Transformer:[Swin Transformer: Hierarchical Vision Transformer using Shifted Windows](https://openaccess.thecvf.com/content/ICCV2021/papers/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper.pdf) (TODO)
+    - Swin Transformer:[Swin Transformer: Hierarchical Vision Transformer using Shifted Windows](https://openaccess.thecvf.com/content/ICCV2021/papers/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper.pdf) 
+    - MViTv2:[MViTv2: Improved Multiscale Vision Transformers for Classification and Detection](https://arxiv.org/pdf/2112.01526.pdf)
 - ResNet:
     - ResNet18, ResNet34, ResNet50, ResNet101, ResNet154:[Deep Residual Learning for Image Recognition](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html)
     - DenseNet121, DenseNet169, DenseNet201, DenseNet264:[Densely connected convolutional networks](https://arxiv.org/pdf/2101.03697.pdf) 
@@ -25,6 +26,7 @@ This part is mainly to reproduce various models, in order to better understand t
     - SRN:[Towards Accurate Scene Text Recognition with Semantic Reasoning Networks](https://openaccess.thecvf.com/content_CVPR_2020/papers/Yu_Towards_Accurate_Scene_Text_Recognition_With_Semantic_Reasoning_Networks_CVPR_2020_paper.pdf)
     - DPAN:[Look Back Again: Dual Parallel Attention Network for Accurate and Robust Scene Text Recognition](https://dl.acm.org/doi/pdf/10.1145/3460426.3463674)
     - PARSeq:[Scene Text Recognition withPermuted Autoregressive Sequence Models](https://arxiv.org/pdf/2207.06966.pdf)
+    - SVTR:[SVTR: Scene Text Recognition with a Single Visual Model](https://arxiv.org/pdf/2205.00159.pdf)
     
 - Key Information Extract
     - SDMGR:[Spatial Dual-Modality Graph Reasoning for Key Information Extraction](https://arxiv.org/abs/2103.14470) (TODO)

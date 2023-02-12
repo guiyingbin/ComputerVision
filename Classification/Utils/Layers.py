@@ -8,6 +8,7 @@ import numpy as np
 import torch.nn.functional as F
 from timm.models.swin_transformer import SwinTransformer
 from timm.models.vision_transformer import VisionTransformer, PatchEmbed
+
 from torch.nn.modules import transformer
 from torch import nn as nn, Tensor
 
@@ -892,7 +893,6 @@ class PARSeq_Decoder(nn.Module):
         query = self.norm(query)
         return query
 
-
 class PARSeq_Encoder(SwinTransformer):
     """
     The Encoder of PARSeq.
@@ -923,7 +923,56 @@ class PARSeq_Encoder(SwinTransformer):
                                              drop_rate=drop_rate,
                                              attn_drop_rate=attn_drop_rate,
                                              drop_path_rate=drop_path_rate,
-                                             num_classes=0)
+                                             num_classes=0,
+                                             ape=False)
+
+    def forward(self, x):
+        return self.forward_features(x)
+
+class PARSeq_EncoderV2(SwinTransformer):
+    """
+    The Encoder of PARSeq.
+    In the original paper of PARSeq, the encoder is ViT. Here, we replace it with SWin Transformer
+    """
+    def __init__(self, img_size,
+                 patch_size=(4, 8),
+                 in_chans=3,
+                 window_size=4,
+                 embed_dim=96,
+                 depths=(2, 2, 6, 2),
+                 num_heads=(3, 6, 12, 24),
+                 mlp_ratio=4,
+                 qkv_bias=True,
+                 drop_rate=0.,
+                 attn_drop_rate=0.,
+                 drop_path_rate=0.):
+
+        super(PARSeq_EncoderV2, self).__init__(img_size=img_size,
+                                             patch_size=patch_size,
+                                             in_chans=in_chans,
+                                             window_size=window_size,
+                                             embed_dim=embed_dim,
+                                             depths=depths,
+                                             num_heads=num_heads,
+                                             mlp_ratio=mlp_ratio,
+                                             qkv_bias=qkv_bias,
+                                             drop_rate=drop_rate,
+                                             attn_drop_rate=attn_drop_rate,
+                                             drop_path_rate=drop_path_rate,
+                                             num_classes=0,
+                                             ape=False)
+
+    def forward_features(self, x):
+        x = self.patch_embed(x)
+        # if self.ape:
+        #     x = x + self.absolute_pos_embed
+        x = self.pos_drop(x)
+
+        temp = []
+        for layer in self.layers:
+            x = layer(x)
+            temp.append(x)
+        return temp
 
     def forward(self, x):
         return self.forward_features(x)
@@ -940,20 +989,25 @@ class Encoder(VisionTransformer):
     def forward(self, x):
         # Return all tokens
         return self.forward_features(x)
+
 if __name__ == "__main__":
     # dense_block = DenseBlock(32, 32, 6)
     # x = torch.randn((3, 32, 224, 224))
     # print(dense_block(x).shape)
     from torchsummary import summary
-    encoder = PARSeq_Encoder(img_size=(32, 256),
+    encoder = PARSeq_EncoderV2(img_size=(32, 512),
                              patch_size=(2, 4),
                              embed_dim=96,
-                             depths=(2, 2),
-                             num_heads=(3, 6))
-    x = torch.randn((1, 3, 32, 256))
+                             depths=(2, 2, 6),
+                             num_heads=(3, 6, 12))
+    x = torch.randn((1, 3, 32, 512))
     # decoder = PARSeq
-    print(encoder(x).shape)
-    print(summary(encoder, input_size=(3, 32, 256), batch_size=1, device="cpu"))
-    vit_encoder = Encoder(img_size=(32, 256), patch_size=[4, 8], embed_dim=192)
+    res = encoder.forward_features(x)
+    for each in res:
+        print(each.shape)
+    # print(res[-1])
+    # print(res[-2])
+    # # print(summary(encoder, input_size=(3, 32,512), batch_size=1, device="cpu"))
+    vit_encoder = Encoder(img_size=(32, 512), patch_size=[4, 8], embed_dim=192)
     print(vit_encoder(x).shape)
-    print(summary(vit_encoder, input_size=(3, 32, 256), batch_size=1, device="cpu"))
+    # print(summary(vit_encoder, input_size=(3, 32, 512), batch_size=1, device="cpu"))

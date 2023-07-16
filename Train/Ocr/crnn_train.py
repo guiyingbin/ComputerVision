@@ -8,8 +8,6 @@ from tqdm import tqdm
 
 from Utils.Tools import AverageMeter
 
-torch.nn.CTCLoss()
-
 
 class Trainer(baseTrainer):
     def __init__(self, cfg=crnn_train_cfg):
